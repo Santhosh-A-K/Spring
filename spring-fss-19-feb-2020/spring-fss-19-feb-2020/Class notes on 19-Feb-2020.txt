@@ -1,0 +1,858 @@
+Class notes on 19-Feb-2020
+==========================
+
+My materials:
+
+1. Text file what I am typing now
+2. PPT
+3. Programs and other things we do in the trianing
+4. Exercises / Assignments
+
+
+https://drive.google.com/drive/folders/1cwdl3kOsM6uCE2X7gA7B-TDRTCOfGiUk?usp=sharing
+
+----
+
+
+Activity 1:
+
+Open Eclipse IDE and just write Hello World program & execute
+
+- Workspace 	(d:\guru)
+- Java Project  (one of the types of project available in Elipse IDE)
+- Java Class
+- main method
+- run the program
+
+Activity 2:
+
+Define the following 2 classes in the same project
+
+	Employee (1st class)
+		Has properties: 
+		empId (of type int)
+		empName (String)
+		empSalary (double)
+		empAddress (of type Address)
+			Can I not give "String" as data type for empAddress?
+
+	Addresss (2nd class)
+		flatNo (int)
+		streetName (String)
+		cityName (String)
+		pinCode (long)
+
+
+Creating object of Address class:
+
+	Address a1=new Address(); // create object of Address class in HEAP memory
+		Since we haven't assigned any values so far,
+		by default, JVM will assign some default values
+		flatNo = 0
+		streetName=null
+		cityName=null
+		pinCode=0
+
+
+Point:
+
+	In Java, you can't print the object directly
+	If you print, you will see only memory address of the object
+
+
+question:
+
+	Between the two given classes: Employee and Address
+
+	If you are a designer, which class you would like to define FIRST?
+
+	Address class
+	Reason:
+		Adress is NOT depending on any other class
+
+	 Spring framework is based on THIS concept
+
+------------
+
+What is Spring?
+
+	- Java based framework
+	- Whatever you do in Java, can be done in Spring also, but with ease and in less time
+		- You won't be writing too much code in Spring framework
+
+What are the various projects available under Spring?
+
+	Day 1 1 Core Spring (Basic spring)
+		- You can develop stand-alone or desktop applications
+		- All the binaries need to be downloaded on the client side before launching this app
+		- This is sometimes called as FAT CLIENT
+		- Database programming using ORACLE DB (using Spring JDBCTemplate)
+
+		- We need to download some libraries (jar files) in order to work with Spring	
+			
+
+Downloading the required libraries:
+
+From the google drive link, download the two zip files and extract them:
+
+c:\spring-lib>
+	12 jar files
+
+c:\spring-mvc-lib>
+	15 jar files
+
+Program 1:
+==========
+
+Displaying "Hello World" using Spring core
+
+
+10.44.83.33/d$
+
+
+Steps:
+
+1. Create a Java project (SpringCore)
+
+2. Add the 12 jar files into the classpath of this project
+this step is known as "Adding libraries to the classpath"
+
+3. Let's define a class "Address" in the package "com.fss"
+
+The same 4 properties
+Generate constructors
+Generate setters & getters
+
+Now, we are going to call this Java class as "Bean"
+"Bean" is a simple Java class with properties, constructors and setters/getters
+This is otherwise called as POJO (Plain Old Java Object)
+
+4. We will be creating a file with the name "Beans.xml" directly under "src" folder
+
+This file is called as META DATA CONFIGURATION file required for Spring
+
+We will be configuring all required "Beans" inside this file
+
+<beans>
+	<bean> </bean>
+	<bean> </bean>
+	<bean> </bean>
+	<bean> </bean>
+
+</beans>
+
+5. Create a class with main method
+
+TestAddress
+
+In this example, I am not creating the Address object myself
+
+ApplicationContext ctx=new ClassPathXmlApplicationContext("Beans.xml");
+Address a=(Address)ctx.getBean("aaa");
+
+The spring framework reads "Beans.xml" file
+Understands the class names and the property names
+Using the various setter methods (from Address class),
+	it creates an empty object of Address class
+	and populates the object with the values specified in Beans.xml 
+	file
+	This is called Dependency Injection
+
+	Finally, it gives us a fully populated Address object
+
+	Using getter methods, we can read the values
+
+The main objective of Spring framework is:
+
+	We will not create objects EXPLICITLY using new keyword
+	Instead, we will delegate this process to Spring framework
+	This concept is called as Inversion of Control (IOC)
+
+1.07 pm
+
+Be back after 1 hour
+
+2.07 pm
+
+----
+Dependency Injection
+
+- Smaller objects are injected into a bigger object to make it complete
+- Very similar to: 	
+	Car is made up of 
+		wheels
+		windows
+		brakes
+		clutch
+
+- Two types of DI		
+	How can we inject the dependent objects?
+	Where to inject?
+	How to inject?
+
+	1. constructor based DI
+
+class Employee
+{
+	Address add;
+	Project prj;
+	
+	public Employee() {}
+
+	public Employee(Address add, Project prj)
+	{
+		this.add=add;
+		this.prj=prj;
+	}
+
+
+}
+
+
+
+	2. setter based DI
+
+class Employee
+{
+	Address add;
+	Project prj;
+
+	public Employee() {}
+
+	public void setAdd(Address add)
+	{
+		this.add=add;
+	}
+
+	public void setPrj(Project prj)
+	{
+		this.prj=prj;
+	}
+
+}	
+
+
+Exercise 2:
+
+Implement setter based DI for Employee having Address object
+
+1. Address class
+2. Employee
+	constructor
+	setter/getter
+3. Beans.xml
+	configure the beans
+	Establish the relationships between them
+4. Write Test class with main method
+	Ask the Spring to give an object of Employee class
+	This will give Employee class obj along with Address object
+
+If you use <property> tag in Beans.xml file, you are establishing the DI based on setter
+
+	<property> - SETTER BASED DI
+
+
+Exercise:
+
+Modify the above program so that now Employee object depends on two objects, implement setter based DI
+
+	Address obj
+	Project obj
+
+Project:
+	projectId
+	projectName
+	clientName
+	budget
+
+******************* DON'T FORGET TO CREATE DEFAULT CONSTRUCTORS ********
+RULE OF THUMB:
+
+	For every class, do the following:
+
+1 Generate default constructor
+2 Generate parameterized constructor
+3 Generate setters and getters
+
+Point:
+	Any time, you modify any property of a class
+	you must generate setters & getters fresh 
+		and also the parameterized constructor
+
+-----
+How to do constructor based DI?
+
+use 
+	<constructor-arg> tag
+	<constructor-arg ref="beanid"></constructor-arg>
+
+Q:
+
+If the employee constructor has other variable/property of type "int" or "String", then how it can be given?
+
+Q:
+
+When to use constructor based DI and when to use setter based DI?
+Which one is better?
+
+A:
+
+If your data is ready, use constructor based DI
+In some cases, if you are waiting for data to be returned from server side (REST, or ORACLE DB....), don't wait for the data to arrive
+Just create empty object
+Later you populate with the data (setter based)
+
+--
+
+15 mins
+
+Do the following in a new project
+
+Customer object is composed of
+	Define firstName, lastName, mobileNumber
+
+	Loan object &
+		Define loanId, loanType, loanAmount, loanDuration
+
+	Savings object
+		Define savingsId, savingsType, balanceAmount
+
+
+1. implement using constructor based DI
+
+2. implement using setter based DI
+
+---
+
+Agenda:
+
+1. Concept of auto wiring
+	a. Using xml
+	b. Using annotations
+
+
+What is auto wiring?
+
+	Automatic
+	Wiring - associating, binding, connection
+
+Whatever configuration we have done so far in XML file, is the manual wiring
+
+<bean id="emp" class="com.fss.Employee">
+	<!-- <property name="empAddress" ref="aaa"></property>
+	<property name="prj" ref="prj1"></property> -->
+	<constructor-arg name="name" value="Guru"/>
+	<constructor-arg ref="aaa"></constructor-arg>
+	<constructor-arg ref="prj1"></constructor-arg>
+</bean>
+
+
+In auto-wiring, we can get rid of these extra lines
+so that we can do the automatic wiring very easily
+in less number of codes
+
+Types of Auto-wiring mode:
+
+1 None - nothing, manual wiring
+2 byName
+
+<bean id="emp" class="com.fss.Employee" autowire="byName">
+</bean>
+
+
+3 byType
+
+Here, instead of name, now it checks for the data type
+Now, the name can be anything, but the type should be the same
+
+Q1:
+
+If Employee depends on two objects Address and Project, will it be done using autoWire?
+
+A:
+
+Yes
+
+
+Q2: 
+Can we auto-wire the String type?
+
+A:
+
+No
+Auto-wiring works only for objects (user-defined or pre-defined)
+It doesn't work for primitive data types and String as well
+
+3. based on constructor
+
+4. auto detect
+
+In Spring framework, you can do the configuration in 3 ways:
+
+1. using Beans.xml 
+	The xml file name need not be Beans.xml ALWAYS
+	The name could be anything
+
+	The location of this file can also be any folder
+
+Points:
+
+	The xml file name can be anything
+	The xml file location can be anything
+		Use FileSystemXmlApplicationContext("d:\\anil\\Beans.xml");
+
+We are calling these classes together as IOC Container
+
+Spring is popularly known as IOC Container
+
+	Container means it provides the run time environment
+	and also takes responsibility of managing these beans
+
+IOC container is the specification/concept
+The above mentioned classes are implementations
+
+
+2. using annotations
+	Partial configuration will be in Beans.xml file
+	Partial configuration will be in Java source code
+
+	@Autowired
+	@Bean
+	@Configuration
+	@Entity
+	@Id
+	@Columns
+	@Override
+
+Use case 1:
+
+	How to use @Required annotation?
+	If you annotate any setter method using this,
+	you MUST provide the value
+	else, it will throw exception
+	Let's do this configuration in Java source code 
+
+Real time use cases:
+
+	any id is the required field/property
+	you must use @Required annotation to avoid the errors
+		made by the user during run-time
+
+How to move the autowire configuration from Beans.xml file to Java side?
+
+	You can use @Autowired annotation
+
+This single annotation @Autowired has removed the configuration requirement from xml file, thus enabling the configuration moved to the Java class
+
+If you have @Autowired in Java class, you will have a better control over coding
+
+If you use autowiring in xml file, there is no mechanism to verify that
+There is no compiler available for XML file for verifying the validation
+But, there is a compiler available for Java
+
+
+Important:
+	By default, annotations are DISABLED by spring
+	You must enable the annotations by adding one property in XML file
+	<context:annotation-config/> 
+
+Activates various annotations to be detected in bean classes: Spring's @Required and @Autowired, as well as JSR 
+ 250's @PostConstruct, @PreDestroy and @Resource (if available), JAX-WS's @WebServiceRef (if available), EJB3's 
+ @EJB (if available), and JPA's @PersistenceContext and @PersistenceUnit (if available). Alternatively, you may 
+ choose to activate the individual BeanPostProcessors for those annotations. Note: This tag does not activate 
+ processing of Spring's @Transactional or EJB3's @TransactionAttribute annotation. Consider the use of the 
+ <tx:annotation-driven> tag for that purpose.
+
+Every bean created by IOC container, there are like 5 scopes available:
+
+You can also specify the scope in the configuration file (xml, or annotation)
+
+There are 5 different scopes availble:
+
+1. singleton (default)
+	For 'n' request, spring IOC container will create only one obj
+
+2. prototype
+	For 'n' request, it will create 'n' objects
+
+3. request
+	this scope is available in web applications
+	If you put any object in "request" scope, that object 
+	will be availble only for one request
+
+4. session
+	this scope is available in web applications
+
+5. global-session
+
+	This is applicable only in case of PORTALS and portlet
+
+
+----
+
+Database Programming in Spring application
+
+JDBC
+
+From Java program, I want to connect to ORACLE DB
+
+Steps:
+
+1. Verify that your ORACLE SERVER IS RUNNING SOMEWHERE
+	and you are able to access it
+	- working
+
+2. Create a Java project in Eclipse:
+	JDBCSpring
+	Add all spring related jar files into that project
+
+3. We want JDBC driver for ORACLE
+
+	We can't connect to ORACLE DB directly from Java program
+	since both are running under different environment
+		(JVM and ORACLE SERVER)
+
+	We need some broker in between
+	We need some intermediate in between
+	This intermediate knows both Java and ORACLE environment
+	Let's name this guy JDBC driver 
+	We give instructions to JDBC driver
+		JDBC driver takes our instruction
+		goes to ORACLE DB
+		executes the query
+		fetches the result
+		gives to us
+
+We need JDBC Driver for ORACLE (ORACLE has provided a class)
+	oracle.jdbc.driver.OracleDriver
+	ip address
+	port no
+	username
+	password
+	db name
+	table name
+This is the basic of JDBC (without Spring framework)
+
+	Spring prov	ides a separate class called JDBCTemplate class
+
+	Now, the developer gets a freedom out of creating the connection
+		closing the connection, handling the exceptions
+
+Bottom line:
+
+	minimize the code
+	maximize the productivity
+
+JDBCTemplate:
+		We can spend 30 to 45 minutes
+
+Start Spring MVC (Web applications)
+
+	spring-mvc-lib.zip
+
+java.guru@yahoo.com
+
+	uttamkumar@fss.co.in
+
+
+
+
+	
+
+
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3. Complete Java based configuration
+	The entire configuration will be done in Java source code
+	There is no need of XML file
+
+
+
+How to do autowiring in Java source code itself?
+
+
+
+
+
+
+
+
+2. DB programming using JDBCTemplate class
+	a. oracle DB
+	b. other DBs
+
+3. Touch slightly on "AOP"
+	Very briefly
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Inversion Of Control
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	Day 2 2. Spring MVC (Model View Controller)
+		- You can develop web applications
+		- Creating web applications and also REST API (RESTful webservices)
+		- Database programming using ORACLE DB (using Spring JDBCTemplate)
+	
+	Day 3 
+		2.1 Spring security aspects
+
+		3. Spring Boot
+		- Makes your life very easier
+		- Within 5 minutes, you can develop a complete, end-to-end applications
+			with less number of coding and zero configuration
+			this will be quality of production grade 
+		- Database programming using ORACLE DB (using Spring JDBCTemplate)
+		  Also using JPA (ORM)
+
+
+
+What we are going to learn?
+
+
+Getting started with Spring framework.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+Any time, you define a new class, you are introducing a new data type in the system
+
+You can introduce new data types based on requirements:
+
+	Product
+
+	Customer
+
+	Sales
+
+Data type - I refer to a Java class
+
+	class Product
+	{
+
+		int productId;
+		String productName;
+		double productPrice;
+
+	}
+
+	
+In Java, there are 8 pre-defined data types available , they are known as PRIMITIVE data types
+	
+	byte
+	short
+	char
+	int
+	float
+	long
+	double
+	boolean
+
+Apart from these primitives, we also have a very very very very special pre-defined class available that will be used in all projects
+
+	String (pre-defined class in Java)
+		- Universal data type
+		- King of all data types
+
+	This class belongs to java.lang package
+
+	Example:
+
+		String myName="Guru";
+
+	I can invoke many operations / methods on this String variable
+
+	myName.length() -> displays no, of chracters from this value
+
+	String is specifically used to represent String variable and also all associated methods
+
+
+
+
+		
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
