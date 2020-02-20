@@ -1,0 +1,513 @@
+Class notes on 20-Feb-2020
+==========================
+
+Day 2: 
+======
+
+JDBC Programming without Spring:
+    
+    1. Load the JDBC Driver class for ORACLE DB / MYSQL DB
+    2. Get a physical connection from the DB server
+    3. Create a Statement
+    4. Execute SQL Query
+    5. Obtain the Result
+    6. Iterate this Result and read information one by one
+
+Every DB vendor gives a jar file that contains the JDBC driver class name
+If we add this jar file to our classpath, this prob. will be rectified
+
+    ojdbc6.jar
+
+From where I can get this jar file?
+
+    1. If you have installed ORACLE server in your machine,
+        the installation folder will contain this file
+
+C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib   
+
+Q:
+
+I don't have ORACLE DB in my project
+We are using MYSQL server
+How can we connect to MYSQL server?
+The driver class name is:
+    com.mysql.jdbc.Driver
+
+What should be the JDBC URL for MySQL?
+    jdbc:mysql://server-name:server-port/db-name
+
+It is very easy to change from one DB server to another DB server
+All you have to do is:
+
+    1. Find out the JDBC driver class and give that in
+        the program
+    2. Find out the JDBC url and give that in
+        the program
+
+Program:
+========
+
+package com.fss;
+import java.sql.*;
+public class SQLDemo {
+
+    public static void main(String[] args) {
+        
+        try {
+            
+        
+        // Step 1: Load the JDBC Driver class for ORACLE
+        Class.forName("com.mysql.jdbc.Driver");
+        
+        // Step 2: Get a physical connection from the SERVER
+        String jdbcURL="jdbc:mysql://localhost:2222/admin";
+        // localhost -> machine name / IP address
+        // 1521 is the ORACLE server's port number
+        // xe is the DB name
+        
+        Connection con=DriverManager.getConnection
+
+(jdbcURL,"system","Password123456");
+        if (con!=null)
+            System.out.println("Connection successful");
+        
+        Statement stmt=con.createStatement();
+        
+        ResultSet rs=stmt.executeQuery("select * from 
+
+employeee");
+        
+        while(rs.next()) {
+            System.out.println(rs.getInt(1)+" "+rs.getString
+
+(2)+" "+rs.getInt(3));
+        }
+        // close the connection
+        con.close();
+        
+        }
+        catch(ClassNotFoundException cnfe)
+        {
+            System.out.println("Sorry...The given class is 
+
+not found in the classpath");
+        }
+        catch(SQLException se)
+        {
+            System.out.println("Sorry...some problems in 
+
+executing your SQL Queries");
+        }
+    }
+
+}
+
+Show me a program in Spring to connect to ORACLE server and do the same?
+
+- You will be writing less code
+- The complexity will be also less
+    
+
+JDBC Programming using Spring JDBCTemplate
+
+We are going to use this class "JDBCTemplate", which is pre-defined by 
+
+Spring.
+
+How easy to configure this?
+Is there any configuration required?
+
+Yes
+
+There is some structure you need to follow.
+You can't use JDBCTemplate directly
+
+In this case:
+
+    you will be maintaining two files
+    1. the configuration file
+        it contains all details about DB server
+        (Beans.xml file)
+
+    2. the actual java code
+        that contains the queries
+        Java Code (POJO)
+
+    During run-time, these two files wil be merged to 
+        give the final output
+
+Benefit:
+    Portability
+    If you want to change the DB server, all you have to do
+    is change in the configuration file
+--
+
+Demo:
+
+How to connect to ORACLE DB and insert one record into EMPLOYEEE table?
+
+1. Create JDBCDemo1 (java project)
+
+2. Add all required jar files into this project
+
+3. Beans.xml
+
+4. Create POJO class Employeee
+    empId
+    empName
+    deptId
+
+constructors & setters/getters
+
+----
+
+Exercise:
+
+How to use "select" queries using jdbc template?
+
+RowMapper is an interface provided by Spring framework
+We must create another class implementing this interface
+
+Completed the following 2 operations:
+
+    1. create (jdbcTemplate.update)
+    2. read   (jdbcTemplate.query)
+    3. update (jdbcTemplate.update)
+    4. delete (jdbcTemplate.update)
+
+these operations are popularly known as _____ (CRUD)
+
+--
+
+
+10.44.86.22
+oracle db
+
+--
+Scenario:
+
+If you can't connect to your local ORACLE server, you can always
+connect to other machine
+
+instead of localhost, just give the IP address of remote machine
+in which ORACLE DB server is running
+
+<property name="url" value="jdbc:oracle:thin:@localhost:1521:xe" />  
+
+to
+
+<property name="url" value="jdbc:oracle:thin:@IP-ADDRESS:1521:xe" />  
+
+--
+Next Topic: SPRING MVC - Developing Web Applications using 
+Spring MVC framework
+
+Requirements:
+
+    1)Any webserver (tomcat, weblogic, websphere, glassfish....)
+    Tomcat v 8.5 
+
+Web apps are deployed in a special software called CONTAINERS
+Such containers would provide additional features to all apps like
+security, scalability....
+
+    2) How the users are going to access web apps?
+
+Browsers
+
+Such apps are not "stand-alone" apps
+
+---
+
+Technically:
+
+1. Eclipse IDE
+
+2. Tomcat 8.5 
+
+3. Web Browser
+
+4. JDK
+
+Web apps can be developed:
+
+    1. without spring framework
+
+Before the invention of spring framework, without any framework, 
+
+developers created web applications using the following core 
+
+technologies:
+
+    a. servlet
+    b. JSP
+
+All web applications started from these 2 technologies
+
+In all web applications, a default file will be created (web.xml)
+This is called as deployment descriptor file
+
+This contains all information about your web application (such as name of 
+
+the servlet, the URL pattern....)
+
+The web apps are based on MVC pattern
+
+MVC 
+    - Model View Controller
+
+This pattern is applicable to all sorts of applications
+The entire project/application is divided into 3 categories for loose 
+
+coupling, convenience and maintenance.
+
+    M   stands for Model
+        Anything related to DATA goes into this layer   
+
+    V   stands for View
+        Anything related to presentation goes into this layer
+
+    C   stands for Controller
+        The moderator
+        The coordinator
+        The receiver
+        the controller
+
+    Controller is like your PROJECT MANAGER
+    Controller WILL NOT DO ANYTHING
+    it will only OBSERVE others
+
+    In a web application, NOTHING WILL HAPPEN without the
+    knowledge of a controller
+    
+    the controller knows everything happening inside the app
+
+    Any request comes to access the application, first it
+        will be directd to the controller
+
+    now, the controller decides what to do next?
+
+In web application "servlet" is the controller
+
+protected void doGet(HttpServletRequest request, HttpServletResponse 
+
+response) throws ServletException, IOException {
+        
+    }
+
+The clinet/end-user sends the request and the HttpServletRequest object 
+
+is used to read the data sent by the client
+
+Similarly, the server sends the information/response using 
+
+HttpServletResponse  object
+
+<url-pattern> is used to map a string to a servlet
+
+/Guru -> mapped to HelloController servlet
+
+---
+If I want to send some data to the server, how can I pass?
+
+I have two numbers, I want to get them added
+Now, the servlet has the "addition" logic
+I have a form, in which I want to enter the data and send it to the 
+
+servlet to get the result
+Flow:
+
+client request--> servlet
+            --> Business Logic method
+            --> calls the View logic
+
+Servlet is the first component that receives the data from the user
+
+
+
+
+
+In Spring MVC, we can achieve the same thing with much less effort
+
+---
+
+In Spring MVC, we will not write any servlet
+
+The framework is providing us a servlet "DispatcherServlet"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+Form.html
+
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<h1> Welcome to My Addition Module </h1>
+
+<form action="Guru" method="post">
+Enter the first no: <input type="text" name="no1"><br>
+Enter the 2nd no: <input type="text" name="no2"><br>
+<input type="submit" value="Add"/>
+</form>
+
+</body>
+</html>
+
+HelloController.java:
+
+package com.fss;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * Servlet implementation class HelloController
+ */
+public class HelloController extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public HelloController() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+     */
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        
+        
+        
+    }
+
+    /**
+     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+     */
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        PrintWriter pw=response.getWriter();
+        int no1=Integer.parseInt(request.getParameter("no1"));
+        int no2=Integer.parseInt(request.getParameter("no2"));
+        int sum=Calculator.add(no1, no2);
+        
+        // View logic
+        // From here, we need to call Result.jsp
+        request.setAttribute("sum", sum);
+        
+        request.getRequestDispatcher("Result.jsp").forward(request, response);
+    }
+
+}
+
+
+Calculator.java:
+
+package com.fss;
+
+public class Calculator {
+    // Business logic has been moved into this class now
+    public static int add(int no1, int no2)
+    {
+        return no1+no2;
+    }
+    //JDBC logic
+}
+
+
+Result.jsp
+
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<h1> Welcome to my View</h1>
+<h2> Your data has been processed and the result is below</h2>
+<h3> ${sum}</h3>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
