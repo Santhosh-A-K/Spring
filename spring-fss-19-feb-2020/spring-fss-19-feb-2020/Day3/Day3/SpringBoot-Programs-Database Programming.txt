@@ -1,0 +1,499 @@
+Spring Boot:
+============
+Database Programming
+====================
+
+
+8) Spring Data JPA:
+
+Embedded Database (Derby)
+
+Reading All customers and adding a customer use cases:
+=======================================================
+POM.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.2.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.ofss</groupId>
+	<artifactId>CustomerAPI-data</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>CustomerAPI-data</name>
+	<description>Customer API using Databases</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+
+
+CustomerAPIDataApplication.java:
+================================
+
+package com.ofss;
+
+
+import org.springframework.boot.SpringApplication;
+
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+
+@SpringBootApplication
+
+public class CustomerApiDataApplication 
+{
+
+	
+	public static void main(String[] args) {
+		
+		SpringApplication.run(CustomerApiDataApplication.class, args);
+	
+	}
+
+
+}
+
+
+
+Customer.java:
+==============
+
+package com.ofss.customer;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
+public class Customer {
+	@Id
+	String firstName;
+	String lastName;
+	long phoneNumber;
+	String emailId;
+	
+	public Customer()
+	{
+		
+	}
+	
+	public Customer(String firstName, String lastName, long phoneNumber, String emailId) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.phoneNumber = phoneNumber;
+		this.emailId = emailId;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public long getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(long phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public String getEmailId() {
+		return emailId;
+	}
+
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
+	}
+	
+}
+
+
+CustomerRepository.java:
+========================
+
+package com.ofss.services;
+
+import org.springframework.data.repository.CrudRepository;
+
+import com.ofss.customer.Customer;
+
+public interface CustomerRepository extends CrudRepository<Customer, String>{
+
+	
+}
+
+
+CustomerService.java:
+=====================
+
+package com.ofss.services;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ofss.customer.Customer;
+
+@Service
+public class CustomerService {
+
+	@Autowired
+	CustomerRepository customerRepository;
+
+	ArrayList<Customer> allCustomers=new ArrayList<Customer>();
+	
+	public List<Customer> getAllCustomers()
+	{
+		System.out.println("Returning all customers using Customer Repository");
+		List<Customer> allCustomers=new ArrayList<>();
+		//customerRepository.findAll()
+		//.forEach(customer -> allCustomers.add(customer));
+		
+		List<Customer> a=customerRepository.findAll();
+		for (int i=0;i<a.size();i++)
+		{
+			Customer c=a.get(i);
+			allCustomers.add(c);
+		}
+		
+		return allCustomers;
+	}
+	
+	public Optional<Customer> getCustomer(String name)
+	{
+		return customerRepository.findById(name);
+	}
+	
+	public void addCustomer(Customer cust)
+	{
+		System.out.println("Adding customer using Customer Repository");
+		customerRepository.save(cust);
+	}
+
+	public void updateCustomer(String customerName, Customer cust) {
+		System.out.println("Updating customer using Customer Repository "+customerName);
+		customerRepository.save(cust);
+	}
+	
+	public void deleteCustomer(String customerName) {
+		System.out.println("Deleting customer using Customer Repository  using name"+customerName);
+		customerRepository.deleteById(customerName);
+	}
+
+	public void deleteCustomer(Customer cust) {
+		System.out.println("Deleting customer using Customer entity "+cust.getFirstName());
+		customerRepository.delete(cust);
+		
+	}
+}
+
+9) Spring Data JPA:
+
+connecting to external database oracle
+
+From pom.xml:
+==============
+Remove the derby related dependency entry.
+Add the following dependency entry for oracle
+
+<dependency>
+    <groupId>com.oracle</groupId>
+    <artifactId>oracle</artifactId>
+    <version>11.2.0.2.0</version>
+</dependency>
+
+
+Download ojdbc6.jar and keep it in some local folder: d:\oracle-driver
+
+Change to this folder and invoke the following command:
+
+mvn install:install-file -Dfile=ojdbc6.jar -DgroupId=com.oracle -DartifactId=oracle -Dversion=11.2.0.2.0 -Dpackaging=jar -DgeneratePom=true	
+
+The last parameter for generating a POM will save you from pom.xml warnings
+
+10) Spring JDBC:
+
+create table employee(firstname varchar2(20) primary key, 
+		      lastname varchar2(20), 
+		      phonenumber number(10), 
+		      emailid varchar2(20));
+
+
+application.properties:
+=======================
+
+server.port=8091
+
+#oracle db settings
+spring.datasource.url=jdbc:oracle:thin:@localhost:1521:xe
+spring.datasource.username=system
+spring.datasource.password=Password123456
+spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
+
+Restart the application
+
+With postman client:
+
+Create some resources (records)
+View the resources
+Update resources
+Delete some resources
+
+EmployeeService.java:
+=====================
+
+package com.ofss.service;
+
+import com.ofss.model.Employee;
+import java.util.*;
+
+public interface EmployeeService {
+	void insertEmployee(Employee emp);
+	void insertEmployees(List<Employee> employees);
+	void getAllEmployees();
+	void getEmployeeById(String empid);
+}
+
+
+EmployeeServiceImpl.java:
+==========================
+
+package com.ofss.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ofss.dao.EmployeeDaoImpl;
+import com.ofss.model.Employee;
+import com.ofss.service.EmployeeService;
+
+@Service
+public class EmployeeServiceImpl implements EmployeeService {
+
+	@Autowired
+	EmployeeDaoImpl employeeDao;
+	
+	@Override
+	public void insertEmployee(Employee emp) {
+		employeeDao.insertEmployee(emp);
+		
+	}
+
+	@Override
+	public void insertEmployees(List<Employee> employees) {
+		
+	}
+
+	@Override
+	public void getAllEmployees() {
+		
+	}
+
+	@Override
+	public void getEmployeeById(String empid) {
+	
+	}
+
+}
+
+EmployeeDao.java:
+=================
+
+package com.ofss.dao;
+
+import java.util.List;
+
+import com.ofss.model.Employee;
+
+public interface EmployeeDao {
+	void insertEmployee(Employee cus);
+	void insertEmployees(List<Employee> employees);
+	List<Employee> getAllEmployees();
+	Employee getEmployeeById(String empId);
+}
+
+EmployeeDaoImpl.java:
+======================
+
+package com.ofss.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+
+import com.ofss.model.Employee;
+
+@Repository
+public class EmployeeDaoImpl extends JdbcDaoSupport implements EmployeeDao{
+	
+	@Autowired 
+	DataSource dataSource;
+	
+	@PostConstruct
+	private void initialize(){
+		setDataSource(dataSource);
+	}
+	
+	@Override
+	public void insertEmployee(Employee emp) {
+		String sql = "INSERT INTO employee " +
+				"(empId, empName) VALUES (?, ?)" ;
+		getJdbcTemplate().update(sql, new Object[]{
+				emp.getEmpId(), emp.getEmpName()
+		});
+		System.out.println("Done inserting");
+	}
+	
+	@Override
+	public void insertEmployees(final List<Employee> employees) {
+		System.out.println("insert employees method size "+employees.size());
+		String sql = "INSERT INTO employee " + "(empId, empName) VALUES (?, ?)";
+		getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				System.out.println("Cursor i is "+i);
+				Employee employee = employees.get(i);
+				ps.setString(1, employee.getEmpId());
+				ps.setString(2, employee.getEmpName());
+			}
+			
+			public int getBatchSize() {
+				return employees.size();
+			}
+		});
+
+	}
+	@Override
+	public List<Employee> getAllEmployees(){
+		String sql = "SELECT * FROM employee";
+		List<Map<String, Object>> rows = getJdbcTemplate().queryForList(sql);
+		
+		List<Employee> result = new ArrayList<Employee>();
+		for(Map<String, Object> row:rows){
+			Employee emp = new Employee();
+			emp.setEmpId((String)row.get("empId"));
+			emp.setEmpName((String)row.get("empName"));
+			result.add(emp);
+		}
+		
+		return result;
+	}
+
+	@Override
+	public Employee getEmployeeById(String empId) {
+		String sql = "SELECT * FROM employee WHERE empId = ?";
+		return (Employee)getJdbcTemplate().queryForObject(sql, new Object[]{empId}, new RowMapper<Employee>(){
+			@Override
+			public Employee mapRow(ResultSet rs, int rwNumber) throws SQLException {
+				Employee emp = new Employee();
+				emp.setEmpId(rs.getString("empId"));
+				emp.setEmpName(rs.getString("empName"));
+				return emp;
+			}
+		});
+	}
+}
+
+Main application: 
+SpringJdbcApplication.java
+==========================
+
+package com.ofss;
+
+import java.util.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+import com.ofss.model.Employee;
+import com.ofss.service.EmployeeService;
+
+@SpringBootApplication
+public class SpringJdbcApplication {
+
+	@Autowired
+	EmployeeService employeeService;
+	
+	public static void main(String[] args) {
+		ApplicationContext context = SpringApplication.run(SpringJdbcApplication.class, args);
+		EmployeeService employeeService = context.getBean(EmployeeService.class);
+		
+		Employee e1=new Employee();	e1.setEmpId("15");	e1.setEmpName("Guru");		
+		employeeService.insertEmployee(e1);
+		
+		Employee e2=new Employee();	e2.setEmpId("25");	e2.setEmpName("Kanna");
+		
+		Employee e3=new Employee();	e3.setEmpId("35");	e3.setEmpName("Krishna");
+		
+		Employee e4=new Employee();	e3.setEmpId("45");	e3.setEmpName("Kishore");
+
+		List<Employee> employees=Arrays.asList(e2,e3,e4);
+		employeeService.insertEmployees(employees);
+
+		System.out.println(employeeService.getAllEmployees());
+	}
+}
+
+
+

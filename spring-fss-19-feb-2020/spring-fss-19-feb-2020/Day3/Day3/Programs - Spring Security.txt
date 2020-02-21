@@ -1,0 +1,2611 @@
+Program 1: 
+Spring MVC - xml Configuration
+===============================
+
+User library from this folder: D:\spring-mvc-lib
+Project name: SpringMVC-XML:
+
+web.xml:
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+  <display-name>SpringMVC-XML</display-name>
+  <welcome-file-list>
+    <welcome-file>Form.html</welcome-file>
+  </welcome-file-list>
+  
+  <servlet>
+  <servlet-name>HelloXML</servlet-name>
+  <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  <servlet-name>HelloXML</servlet-name>
+  <url-pattern>/ofss/*</url-pattern>
+  </servlet-mapping>
+</web-app>
+
+/WEB-INF/HelloXML-servlet.xml:
+==============================
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans      
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+   http://www.springframework.org/schema/context  
+   http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<context:component-scan base-package="com.ofss"></context:component-scan>
+
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/"></property>
+		<property name="suffix" value=".jsp"></property>
+
+	</bean>
+
+</beans>  
+
+HelloController.java:
+======================
+package com.ofss;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@Controller
+public class HelloController {
+
+	@RequestMapping(value="hello", method=RequestMethod.GET)
+	public String m1(@RequestParam(value="myName") String myName1, ModelMap map)
+	{
+		map.addAttribute("msg","Hello "+myName1);
+		return "hello";
+	}
+}
+
+Form.html:
+==========
+<html>
+<head>
+<title>Form</title>
+</head>
+<body>
+<h1> Enter your name</h1>
+<form action="ofss/hello" method="get">
+Enter name please: <input type="text" name="myName"/>
+<br>
+<input type="submit" value="Go"/>
+</form>
+
+</body>
+</html>
+
+/WEB-INF/views/hello.jsp:
+=========================
+<html>
+<head>
+<title>Spring MVC XML Demo</title>
+</head>
+<body>
+Hello ${msg}
+</body>
+</html>
+
+
+Program 2:
+==========
+
+Spring MVC - without .xml (Java based configuration):
+
+Use Version 5: D:\spring-web-security-lib-v5
+
+Create dynamic web project (SpringMVC-Java) with web dynamic module version 3.1
+
+FrontControllerConfig.java (replacement of web.xml):
+====================================================
+package com.ofss;
+/* Replacing web.xml */
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+
+public class FrontControllerConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
+
+	@Override
+	protected Class<?>[] getRootConfigClasses() {
+
+		return new Class[] { WebMvcConfig.class };
+	}
+
+	@Override
+	protected Class<?>[] getServletConfigClasses() {
+
+		return null;
+	}
+
+	@Override
+	protected String[] getServletMappings() {
+		return new String[] { "/" };
+	}
+}
+
+
+WebMvcConfig.java (replacement dispatcher-servlet.xml):
+=======================================================
+
+package com.ofss;
+/* replacing dispatcher-servlet.xml*/
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+
+@Configuration
+@EnableWebMvc
+@ComponentScan("com.ofss")
+public class WebMvcConfig {
+
+	@Bean
+	public InternalResourceViewResolver viewResolver() {
+		InternalResourceViewResolver vr = new InternalResourceViewResolver();
+
+		// set location of views.
+		vr.setPrefix("/WEB-INF/views/");
+
+		// set the extension of views.
+		vr.setSuffix(".jsp");
+
+		return vr;
+	}
+	
+}
+
+HelloController.java:
+=====================
+
+package com.ofss;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@Controller
+public class HelloController {
+
+	@RequestMapping(value="/", method=RequestMethod.GET)
+	public String homePage()
+	{
+		return "Form";
+	}
+	
+	@RequestMapping(value="helloJava", method=RequestMethod.GET)
+	public String m1(@RequestParam(value="myName") String myName1, ModelMap map)
+	{
+		map.addAttribute("msg","From Java configuration "+myName1);
+		return "hello";
+	}
+}
+
+/WEB-INF/views/Form.jsp:
+=========================
+
+<html>
+<head>
+<title>Form</title>
+</head>
+<body>
+<h1> Enter your name</h1>
+<form action="helloJava" method="get">
+Enter name please: <input type="text" name="myName"/>
+<br>
+<input type="submit" value="Go"/>
+</form>
+
+</body>
+</html>
+
+/WEB-INF/views/hello.jsp:
+=========================
+
+<html>
+<body>
+
+	<h2>Hello ${msg}</h2>
+
+</body>
+</html>
+
+
+Program 3 (Spring mvc - another way):
+=======================================
+
+Project: Use the same project above
+
+Comment out all lines from FrontControllerConfig.java and define the following java class for this programs
+
+FrontControllerConfig1.java:
+============================
+package com.ofss;
+
+import javax.servlet.*;
+
+import org.springframework.web.WebApplicationInitializer;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
+
+public class FrontControllerConfig1 implements WebApplicationInitializer {
+
+	@Override
+	public void onStartup(ServletContext servletContext) throws ServletException {
+		System.out.println("****  onStartup method called ***");
+		AnnotationConfigWebApplicationContext dispatcherServletContext = new AnnotationConfigWebApplicationContext();
+
+        dispatcherServletContext.register(WebMvcConfig1.class);
+
+        DispatcherServlet dispatcherServlet = new DispatcherServlet(dispatcherServletContext);
+
+        // Create a servlet dynamically.
+        ServletRegistration.Dynamic dispatcher = servletContext.addServlet("DispatcherServlet", dispatcherServlet);
+
+        dispatcher.setLoadOnStartup(1);
+
+        dispatcher.addMapping("/guru/*");
+		
+	}
+	
+}
+
+WebMvcConfig.java :
+===================
+(same as above)
+
+package com.ofss;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+
+@Configuration
+@EnableWebMvc
+@ComponentScan("com.ofss")
+public class WebMvcConfig {
+
+	@Bean
+	public InternalResourceViewResolver v()
+	{
+		InternalResourceViewResolver v=new InternalResourceViewResolver("/WEB-INF/myviews/", ".jsp");
+		return v;
+	}
+}
+
+Form.jsp:
+==========
+Same as above
+
+hello.jsp:
+============
+Same as above
+
+Program 4:
+=========
+
+Spring Security - Basic Authentication:
+=======================================
+
+Step 1: Create Dynamic Web Project Name: SpringSecurity1 (Select Apache Tomcat version 8.5)
+Select web module version 2.5 and select apache tomcat 8.5
+
+step 2: Copy the required jar files to WEB-INF\lib folder (D:\spring-security-web-v3.0.5)
+
+Step 3: web.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="WebApp_ID" version="2.5">
+	<display-name>SpringSecurity1</display-name>
+	<servlet>
+		<servlet-name>spring1</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>spring1</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	<!--creates a root web-application-context for the web-application and puts it in the ServletContext.  -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>  
+                /WEB-INF/spring1-servlet.xml  
+                /WEB-INF/spring1-security.xml  
+            </param-value>
+	</context-param>
+</web-app>
+
+Step 4: spring1-servlet.xml (under WEB-INF folder)
+
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"  
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+xmlns:mvc="http://www.springframework.org/schema/mvc"  
+xmlns:context="http://www.springframework.org/schema/context"  
+xsi:schemaLocation="  
+http://www.springframework.org/schema/mvc  
+http://www.springframework.org/schema/mvc/spring-mvc.xsd  
+http://www.springframework.org/schema/beans  
+http://www.springframework.org/schema/beans/spring-beans.xsd  
+http://www.springframework.org/schema/context   
+http://www.springframework.org/schema/context/spring-context.xsd">  
+<mvc:annotation-driven />  
+   <context:component-scan base-package="com.ofss">  
+   </context:component-scan>  
+   <context:annotation-config></context:annotation-config>  
+   <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">  
+      <property name="prefix" value="/WEB-INF/views/"></property>  
+      <property name="suffix" value=".jsp"></property>  
+   </bean>
+     
+</beans>  
+
+Step 5: Create spring1-security.xml (under WEB-INF folder)
+
+<beans:beans
+	xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+    http://www.springframework.org/schema/beans/spring-beans.xsd  
+    http://www.springframework.org/schema/security  
+    http://www.springframework.org/schema/security/spring-security.xsd">
+	<http>
+		<intercept-url pattern="/private" access="ROLE_ADMIN" />
+		<http-basic/>
+	</http>
+	<authentication-manager>
+		<authentication-provider>
+			<user-service>
+				<user authorities="ROLE_ADMIN" name="guru" password="guru123" />
+			</user-service>
+		</authentication-provider>
+	</authentication-manager>
+</beans:beans>  
+
+Step 6: Create the controller class:
+
+Create SecurityController.java under com.ofss package
+
+package com.ofss;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+public class SecurityController {
+
+	@RequestMapping(value="public", method=RequestMethod.GET)
+	public String publicPage()
+	{
+		return "public";
+	}
+	
+	@RequestMapping(value="private", method=RequestMethod.GET)
+	public String privatePage()
+	{
+		return "private";
+	}
+}
+
+Step 8: Create views folder under WEB-INF
+
+Step 9: Create public.jsp under views folder as follows:
+
+<html>
+<head>
+<title>Public page</title>
+</head>
+<body>
+<h1> Public page</h1>
+</body>
+</html>
+
+Step 10: Create private.jsp under views folder as follows:
+
+
+<html>
+<head>
+
+<title>Private Page</title>
+</head>
+<body>
+	<h1>Private page</h1>
+
+</body>
+</html>
+
+Step 11: Right click the project...Run as....Run on server .... select Tomcat version 8.5
+
+Step 12: When the browser opens:  enter:http://localhost:8095/SpringSecurity1/public
+
+It should display the public.jsp page
+
+Enter: http://localhost:8095/SpringSecurity1/private
+It should ask the username and password:  guru and guru123
+
+
+If you want to display the username who has logged in:
+
+Modify private.jsp as follows:
+
+<html>
+<head>
+
+<title>Private Page</title>
+</head>
+<body>
+	<h1>Private page</h1>
+	<h1> ${msg}</h1>
+</body>
+</html>
+
+Modify SecurityController.java as follows:
+
+package com.ofss;
+
+import java.security.Principal;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+public class SecurityController {
+
+	@RequestMapping(value="public", method=RequestMethod.GET)
+	public String publicPage()
+	{
+		return "public";
+	}
+	
+	@RequestMapping(value="private", method=RequestMethod.GET)
+	public String privatePage(Principal principal,ModelMap map)
+	{
+		String msg="Hello "+principal.getName();
+		map.addAttribute("msg",msg);
+		return "private";
+	}
+}
+
+
+Program 2:
+=========
+
+Spring Security - Default form Authentication:
+=======================================
+
+Just change in spring1-security.xml file as follows:
+
+<http>
+		<intercept-url pattern="/private" access="ROLE_ADMIN" />
+		<form-login/>
+</http>
+
+Complete file:
+==============
+<beans:beans
+	xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+    http://www.springframework.org/schema/beans/spring-beans.xsd  
+    http://www.springframework.org/schema/security  
+    http://www.springframework.org/schema/security/spring-security.xsd">
+	<http>
+		<intercept-url pattern="/private" access="ROLE_ADMIN" />
+		<form-login/>
+	</http>
+	<authentication-manager>
+		<authentication-provider>
+			<user-service>
+				<user authorities="ROLE_ADMIN" name="guru" password="guru123" />
+			</user-service>
+		</authentication-provider>
+	</authentication-manager>
+</beans:beans>  
+
+
+** If you want to provide a home page through which you want to route either to public or private page:
+
+Add the followig method in SecurityController.java
+
+	@RequestMapping(value="/", method=RequestMethod.GET)
+	public String home()
+	{
+		return "home";
+	}
+
+Add home.jsp:
+
+<html>
+<head>
+<title>Home Page</title>
+</head>
+<body>
+<h1>Home page</h1>
+<a href="http://localhost:8095/SpringSecurity1/public">public page</a> <br>
+<a href="http://localhost:8095/SpringSecurity1/private">private page</a>
+</body>
+</html>
+
+Program 3:
+=========
+
+Spring Security - Custom form with logout:
+=========================================
+
+Add the following in spring1-security.xml:
+
+<beans:beans
+	xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+    http://www.springframework.org/schema/beans/spring-beans.xsd  
+    http://www.springframework.org/schema/security  
+    http://www.springframework.org/schema/security/spring-security.xsd">
+	<http>
+		<intercept-url pattern="/private" access="ROLE_ADMIN, ROLE_USERS" />
+		<form-login login-page="/login" authentication-failure-url="/wrongUser"/>
+		<logout logout-success-url="/"/>
+	</http>
+	<authentication-manager>
+		<authentication-provider>
+			<user-service>
+				
+				<user name="guru" password="guru123" authorities="ROLE_ADMIN"/>
+				<user name="peter" password="peter123" authorities="ROLE_ADMIN"/>
+				<user name="john" password="john123" authorities="ROLE_USERS"/>
+				
+			</user-service>
+		</authentication-provider>
+	</authentication-manager>
+</beans:beans>  
+
+SecurityController.java:
+========================
+package com.ofss;
+
+import java.security.Principal;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+public class SecurityController {
+
+	@RequestMapping(value="public", method=RequestMethod.GET)
+	public String publicPage()
+	{
+		return "public";
+	}
+	
+	@RequestMapping(value="private", method=RequestMethod.GET)
+	public String privatePage(Principal principal,ModelMap map)
+	{
+		String msg="Hello "+principal.getName();
+		map.addAttribute("msg",msg);
+		return "private";
+	}
+	
+	@RequestMapping(value="/", method=RequestMethod.GET)
+	public String home()
+	{
+		return "home";
+	}
+	
+	@RequestMapping(value="/login", method=RequestMethod.GET)
+	public String login()
+	{
+		return "login";
+	}
+	
+	@RequestMapping(value="/loginFailed", method=RequestMethod.GET)
+	public String loginFailed()
+	{
+		return "login";
+	}
+	
+	@RequestMapping(value="/logout", method=RequestMethod.GET)
+	public String logout()
+	{
+		return "login";
+	}
+	
+	@RequestMapping(value="/wrongUser", method=RequestMethod.GET)
+	public String wrongUser()
+	{
+		return "wrongUser";
+	}
+	
+}
+
+login.jsp:
+==========
+<html>
+<head>
+
+<title>Custome Login Page</title>
+</head>
+<body bgcolor="cyan">
+<h1> Login Page - Custom</h1>
+
+<form action="j_spring_security_check" method="post">
+Enter username: <input type="text" name="j_username"/>
+Enter password: <input type="password" name="j_password"/>
+<input type="submit" value="Login"/>
+<input type="reset" name="reset"/>
+</form>
+</body>
+</html>
+
+private.jsp:
+============
+<html>
+<head>
+
+<title>Private Page</title>
+</head>
+<body>
+	<h1>Private page</h1>
+	<h1> ${msg}</h1>
+	<a href="http://localhost:8095/SpringSecurity1">Home</a>
+	<a href="j_spring_security_logout">Logout</a>
+</body>
+</html>
+
+
+Program 4: Custom error messages:
+=================================
+
+Create mymessages_en_US.properties under "src" folder with the following content:
+
+	AbstractUserDetailsAuthenticationProvider.badCredentials=Invalid username or password (My custom message)
+
+Register message source in spring1-security.xml file as follows:
+
+   <bean id="messageSource"	class="org.springframework.context.support.ResourceBundleMessageSource">
+	<property name="basename">
+		<value>mymessages</value>
+	</property>
+  </bean>
+
+  
+Program 5: Custom error messages with style:
+============================================= 
+
+login.jsp:
+==========
+This needs JSTL-1.2.jar file (add in pom.xml and download)
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<html>
+<head>
+
+<title>Custom Login Page</title>
+<style>
+.errorblock {
+ color: #ff0000;
+ background-color: #ffEEEE;
+ border: 3px solid #ff0000;
+ padding: 8px;
+ margin: 16px;
+}
+</style>
+</head>
+<body bgcolor="cyan">
+<h1> Login Page - Custom</h1>
+
+
+<c:if test="${SPRING_SECURITY_LAST_EXCEPTION!=null}">
+  <div class="errorblock">
+   Your login attempt was not successful, try again.<br /> 
+   Caused : ${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}
+  </div>
+ </c:if>
+ 
+<form action="j_spring_security_check" method="post">
+Enter username: <input type="text" name="j_username"/>
+Enter password: <input type="password" name="j_password"/>
+<input type="submit" value="Login"/>
+<input type="reset"/>
+</form>
+</body>
+</html>
+
+spring-security.xml:
+====================
+<beans:beans
+	xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+    http://www.springframework.org/schema/beans/spring-beans.xsd  
+    http://www.springframework.org/schema/security  
+    http://www.springframework.org/schema/security/spring-security.xsd">
+	<http>
+		<intercept-url pattern="/private" access="ROLE_ADMIN, ROLE_USERS" />
+		<form-login login-page="/login"/>
+		<logout logout-success-url="/"/>
+	</http>
+	<authentication-manager>
+		<authentication-provider>
+			<user-service>
+				
+				<user name="guru" password="guru123" authorities="ROLE_ADMIN"/>
+				<user name="peter" password="peter123" authorities="ROLE_ADMIN"/>
+				<user name="john" password="john123" authorities="ROLE_USERS"/>
+				
+			</user-service>
+		</authentication-provider>
+	</authentication-manager>
+</beans:beans>  
+
+Program 6:
+==========
+
+Get the cursor on username field upon loading login page:
+
+in Login.jsp, just add the following:
+
+<body onload="document.myform.j_username.focus();" bgcolor="cyan">
+
+<form name="myform" action="j_spring_security_check" method="post">
+	
+
+Program 7:
+==========
+Auth providers:
+
+Generating Hashed password:
+
+ShaDemo.java:
+=============
+package com.ofss;
+import java.math.BigInteger; 
+import java.security.MessageDigest; 
+import java.security.NoSuchAlgorithmException; 
+
+public class ShaDemo { 
+	public static String getSHA(String input) 
+	{ 
+		try { 
+			// Static getInstance method is called with hashing SHA 
+			MessageDigest md = MessageDigest.getInstance("SHA-256"); 
+
+			// digest() method called 
+			// to calculate message digest of an input 
+			// and return array of byte 
+			byte[] messageDigest = md.digest(input.getBytes()); 
+
+			BigInteger no = new BigInteger(1, messageDigest); 
+
+			// Convert message digest into hex value 
+			String hashtext = no.toString(16); 
+
+			while (hashtext.length() < 32) { 
+				hashtext = "0" + hashtext; 
+			} 
+
+			return hashtext; 
+		} 
+		catch (NoSuchAlgorithmException e) { 
+			System.out.println("Exception thrown"
+							+ " for incorrect algorithm: " + e); 
+
+			return null; 
+		} 
+	} 
+
+	public static void main(String args[]) throws NoSuchAlgorithmException 
+	{ 
+		String s1 = "peter123"; 
+		System.out.println("\n" + s1 + " : " + getSHA(s1)); 
+	} 
+} 
+
+spring-security.xml:
+====================
+Note the password for peter:
+
+Encoded password:
+=================
+<beans:beans
+	xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+    http://www.springframework.org/schema/beans/spring-beans.xsd  
+    http://www.springframework.org/schema/security  
+    http://www.springframework.org/schema/security/spring-security.xsd">
+	<http>
+		<intercept-url pattern="/private" access="ROLE_ADMIN, ROLE_USERS" />
+		<form-login login-page="/login"/>
+		<logout logout-success-url="/"/>
+	</http>
+	<authentication-manager>
+		<authentication-provider>
+			<user-service>
+				
+				<user name="guru" password="guru123" authorities="ROLE_ADMIN"/>
+				<user name="peter" password="fd82f0e95c8034cfeacd4fb4d2853d50749364f1c98f780158aa3196fed7d0d7" authorities="ROLE_ADMIN"/>
+				<user name="john" password="john123" authorities="ROLE_USERS"/>
+			</user-service>
+			<password-encoder hash="sha-256"></password-encoder>			
+	</authentication-provider>
+	</authentication-manager>
+</beans:beans>  
+
+Program 8: JDBC-USER-SERVICE:
+==============================
+
+spring1-security.xml:
+====================
+
+<beans:beans
+	xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+    http://www.springframework.org/schema/beans/spring-beans.xsd  
+    http://www.springframework.org/schema/security  
+    http://www.springframework.org/schema/security/spring-security.xsd">
+	<http>
+		<intercept-url pattern="/private"
+			access="ROLE_ADMIN, ROLE_USERS" />
+		<form-login login-page="/login" />
+		<logout logout-success-url="/" />
+	</http>
+	<authentication-manager>
+		<authentication-provider>
+			<jdbc-user-service data-source-ref="dataSource"
+				users-by-username-query="select username,password, enabled from users where username=?"
+				authorities-by-username-query="select username, role from user_roles where username =?  " />
+
+		</authentication-provider>
+	</authentication-manager>
+</beans:beans>  
+
+spring1-servlet.xml:
+====================
+
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"  
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+xmlns:mvc="http://www.springframework.org/schema/mvc"  
+xmlns:context="http://www.springframework.org/schema/context"  
+xsi:schemaLocation="  
+http://www.springframework.org/schema/mvc  
+http://www.springframework.org/schema/mvc/spring-mvc.xsd  
+http://www.springframework.org/schema/beans  
+http://www.springframework.org/schema/beans/spring-beans.xsd  
+http://www.springframework.org/schema/context   
+http://www.springframework.org/schema/context/spring-context.xsd">  
+<mvc:annotation-driven />  
+   <context:component-scan base-package="com.ofss">  
+   </context:component-scan>  
+   <context:annotation-config></context:annotation-config>  
+   <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">  
+      <property name="prefix" value="/WEB-INF/views/"></property>  
+      <property name="suffix" value=".jsp"></property>  
+   </bean>
+   
+   <bean id="messageSource"	class="org.springframework.context.support.ResourceBundleMessageSource">
+	<property name="basename">
+		<value>mymessages</value>
+	</property>
+	
+	
+  </bean>
+  	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"
+			value="oracle.jdbc.driver.OracleDriver"></property>
+		<property name="url"
+			value="jdbc:oracle:thin:@localhost:1521:xe"></property>
+		<property name="username" value="system"></property>
+		<property name="password" value="Password123"></property>
+	</bean>
+  
+     
+</beans>  
+
+Create the following two tables:
+================================
+SQL> desc users;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ USERNAME                                           VARCHAR2(10)
+ PASSWORD                                           VARCHAR2(10)
+ ENABLED                                            NUMBER(1)
+
+Records:
+
+SQL> select * from users;
+
+USERNAME   PASSWORD      ENABLED
+---------- ---------- ----------
+kavana     123                 1
+SAIF       234                 1
+ASWINI     555                 1
+ 
+ 
+SQL> desc user_roles;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ USERNAME                                           VARCHAR2(10)
+ ROLE                                               VARCHAR2(10)
+ 
+ SQL> select * from  user_roles;
+
+USERNAME   ROLE
+---------- ----------
+kavana     ROLE_ADMIN
+ASWINI     ROLE_ADMIN
+
+SecurityController.java:
+========================
+package com.ofss;
+
+import java.security.Principal;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+public class SecurityController {
+
+	@RequestMapping(value="public", method=RequestMethod.GET)
+	public String publicPage()
+	{
+		return "public";
+	}
+	
+	@RequestMapping(value="private", method=RequestMethod.GET)
+	public String privatePage(Principal principal,ModelMap map)
+	{
+		String msg="Hello "+principal.getName();
+		map.addAttribute("msg",msg);
+		return "private";
+	}
+	
+	@RequestMapping(value="/", method=RequestMethod.GET)
+	public String home()
+	{
+		return "home";
+	}
+	
+	@RequestMapping(value="/login", method=RequestMethod.GET)
+	public String login()
+	{
+		return "login";
+	}
+	
+	@RequestMapping(value="/loginFailed", method=RequestMethod.GET)
+	public String loginFailed()
+	{
+		return "login";
+	}
+	
+	@RequestMapping(value="/logout", method=RequestMethod.GET)
+	public String logout()
+	{
+		return "login";
+	}
+	
+	@RequestMapping(value="/wrongUser", method=RequestMethod.GET)
+	public String wrongUser()
+	{
+		return "wrongUser";
+	}
+	
+}
+
+
+Program 9: Java Based security (NO XML):
+========================================
+
+Dynamic web Project Name: SpringSecurity2
+
+HomeController.java
+===================
+
+package com.ofss;  
+import org.springframework.stereotype.Controller;  
+import org.springframework.web.bind.annotation.RequestMapping;  
+import org.springframework.web.bind.annotation.RequestMethod;  
+@Controller
+public class HomeController {
+
+	@RequestMapping(value="public", method=RequestMethod.GET)
+	public String publicPage()
+	{
+		System.out.println("returning public view");
+		return "public";
+		
+	}
+	
+	@RequestMapping(value="private", method=RequestMethod.GET)
+	public String privatePage()
+	{
+		System.out.println("returning private view");
+		return "private";
+	}
+	
+	@RequestMapping(value="/", method=RequestMethod.GET)
+	public String just()
+	{
+		return "home";
+	}
+	
+
+	@RequestMapping(value="logout", method=RequestMethod.GET)
+	public String logoutMethod()
+	{
+		return "logoutView";
+	}
+	
+	
+}
+MvcWebApplicationInitializer.java:
+==================================
+
+This is a replacement for web.xml
+
+
+package com.ofss;  
+/* Replacing web.xml */  
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;  
+public class MvcWebApplicationInitializer extends  
+        AbstractAnnotationConfigDispatcherServletInitializer 
+        {  
+    @Override  
+    protected Class<?>[] getRootConfigClasses() {
+    	System.out.println("inside getRootConfigClasses");
+        return new Class[] { WebSecurityConfig.class, WebMvcConfig.class };  
+    }  
+    @Override  
+    protected Class<?>[] getServletConfigClasses() {  
+        System.out.println("Inside getServletConfigclasses method");  
+        return null;  
+    }  
+    @Override  
+    protected String[] getServletMappings() {
+    	System.out.println("inside getServletMappings method");
+    	return new String[] { "/" }; 
+    }  
+}  
+
+
+SecurityWebApplicationInitializer.java:
+=======================================
+
+/*
+ is used to register the DelegatingFilterProxy to use 
+ the springSecurityFilterChain. It avoids writing Filters configuration in web.xml file.
+ */
+package com.ofss;
+
+import org.springframework.security.web.context.*;  
+  
+public class SecurityWebApplicationInitializer  
+    extends AbstractSecurityWebApplicationInitializer {  
+  
+}  
+
+WebMvcConfig.java (replacing dispatcher-servlet.xml):
+======================================================
+
+package com.ofss;
+/* replacing dispatcher-servlet.xml*/
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+
+@Configuration
+@EnableWebMvc
+@ComponentScan("com.ofss")
+public class WebMvcConfig {
+
+	@Bean
+	public InternalResourceViewResolver viewResolver() {
+		InternalResourceViewResolver vr = new InternalResourceViewResolver();
+
+		// set location of views.
+		vr.setPrefix("/WEB-INF/views/");
+
+		// set the extension of views.
+		vr.setSuffix(".jsp");
+
+		return vr;
+	}
+}
+
+
+WebSecurityConfig.java (replacing spring-security.xml):
+=======================================================
+
+package com.ofss;
+
+import org.springframework.context.annotation.*;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+//import org.springframework.security.config.annotation.authentication.builders.*;  
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;  
+import org.springframework.security.config.annotation.web.configuration.*;  
+import org.springframework.security.core.userdetails.User;  
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;  
+
+/** This configuration creates a Servlet Filter known as the springSecurityFilterChain. 
+ * It is responsible for protecting the application URLs, validating submit username and password, redirecting to the login form etc. 
+ * 
+ * @author admin
+ *
+ */
+@Configuration
+@EnableWebSecurity  
+@ComponentScan("com.ofss")  
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter  {  
+
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http
+		.authorizeRequests()
+		.antMatchers("/private")
+		.hasRole("USER")
+		.and()
+		.httpBasic();
+	}
+
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		System.out.println("Entering configure method");
+		PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+		auth.inMemoryAuthentication()
+		.withUser("user")
+		.password(encoder.encode("password123"))
+		.roles("USER");
+
+
+	}
+
+}  
+
+
+home.jsp (under /WEB-INF/views):
+================================
+
+<html>
+<head>
+<title>Home page</title>
+</head>
+<body>
+<h1> Home Page</h1>
+<a href="public">Public Page</a><br>
+<a href="private">Private Page</a>
+</body>
+</html>
+
+private.jsp (under /WEB-INF/views):
+=====================================
+
+<html>
+<head>
+
+<title>Insert title here</title>
+</head>
+<body>
+<h1> Java Spring Security</h1>
+<h1> Private page</h1>
+<a href="http://localhost:8095/SpringSecurity2">Home</a>
+</body>
+</html>
+
+public.jsp (under /WEB-INF/views):
+=====================================
+<html>
+<head>
+
+<title>Insert title here</title>
+</head>
+<body>
+<h1> Java Spring Security</h1>
+<h1> Public page</h1>
+<a href="http://localhost:8095/SpringSecurity2">Home</a>
+</body>
+</html>
+
+
+Program 10: Java Based security with PasswordEncoder
+====================================================
+
+Introduce the following method in WebSecurityConfig.java:
+
+	 @Bean
+	    public PasswordEncoder passwordEncoder() {
+	        return new BCryptPasswordEncoder();
+	    }
+
+		
+Modify configure(AuthenticationManagerBuilder auth) method as follows:
+========================================================================
+
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		System.out.println("Entering configure method");
+		PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+		auth.inMemoryAuthentication()
+		.withUser("user")
+		.password("$2a$10$vCBmLuxmaa8qWYo3b9UpFO0c6LOpc4Rs57JyNAt6g9Ns8IsmH5CWq")
+		.roles("USER");
+
+
+	}
+
+You should encode the password "password" using BCryptPasswordEncode:
+=====================================================================
+
+Sample program:
+===============
+package com.ofss;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+public class PasswordEncoderGenerator {
+
+  public static void main(String[] args) {
+
+	int i = 0;
+	
+		String password = "password";
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		String hashedPassword = passwordEncoder.encode(password);
+		System.out.println(hashedPassword+"!"); // this prints encoded password $2a$10$vCBmLuxmaa8qWYo3b9UpFO0c6LOpc4Rs57JyNAt6g9Ns8IsmH5CWq
+
+  }
+}
+
+Program 11: Java Based default form authentication:
+==================================================
+
+Just change the following in WebSecurityConfig.java:
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http
+		.authorizeRequests()
+		.antMatchers("/private")
+		.hasRole("USER")
+		.and()
+		.formLogin();
+	}
+
+
+
+Program 12: JDBC authentication Java Config:
+============================================
+
+private.jsp:
+============
+
+<html>
+<head>
+
+<title>Insert title here</title>
+</head>
+<body>
+<h1> Java Spring Security</h1>
+<h1> Private page</h1>
+<h1> You are ${userName}!!!</h1>
+<a href="http://localhost:8095/SpringSecurity2">Home</a>
+</body>
+</html>
+
+HomeController.java:
+=====================
+
+	@RequestMapping(value="private", method=RequestMethod.GET)
+	public String privatePage(Principal principal, ModelMap map)
+	{
+		String userName=principal.getName();
+		map.addAttribute("userName",userName);
+		return "private";
+	}
+
+	
+AppConfig.java:
+==============
+
+package com.ofss;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
+
+@Configuration
+@PropertySource("classpath:db.properties")
+public class AppConfig {
+
+  @Autowired
+  private Environment env;
+
+  @Bean
+  public DataSource getDataSource() {
+	System.out.println("*** Entering getDatasource() method ");
+    BasicDataSource dataSource = new BasicDataSource();
+    dataSource.setDriverClassName(env.getProperty("oracle.driver"));
+    dataSource.setUrl(env.getProperty("oracle.jdbcUrl"));
+    dataSource.setUsername(env.getProperty("oracle.username"));
+    dataSource.setPassword(env.getProperty("oracle.password"));
+    return dataSource;
+  }
+}
+
+WebSecurityConfig.java:
+=======================
+package com.ofss;
+
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.*;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+//import org.springframework.security.config.annotation.authentication.builders.*;  
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;  
+import org.springframework.security.config.annotation.web.configuration.*;  
+import org.springframework.security.core.userdetails.User;  
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;  
+
+/** This configuration creates a Servlet Filter known as the springSecurityFilterChain. 
+ * It is responsible for protecting the application URLs, validating submit username and password, redirecting to the login form etc. 
+ * 
+ * @author admin
+ *
+ */
+@Configuration
+@EnableWebSecurity  
+@ComponentScan("com.ofss")  
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter  {  
+
+	@Autowired
+	  private DataSource dataSource;
+	
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http
+		.authorizeRequests()
+		.antMatchers("/private")
+		.hasRole("ADMIN")
+		.and()
+		.httpBasic();
+	}
+
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		System.out.println("Entering JDBC authentication");
+		auth.jdbcAuthentication().dataSource(dataSource)
+        .usersByUsernameQuery("select username, password, enabled"
+            + " from users where username=?")
+        .authoritiesByUsernameQuery("select username, role "
+            + "from user_roles where username=?")
+        .passwordEncoder(new BCryptPasswordEncoder());
+        
+        
+	}
+}  
+
+-----------------------------------------------------------------------------
+
+Run this program to get the encoded password
+Insert this encoded password to DB table (users)
+
+update users set password='$2a$10$UnZwy5.CUNh1x6hlVU/e1eHwEKSXp0hspQ0atZnrgJsRYRvArlWNO' where username='kavana';
+
+SQL> select * from users;
+
+USERNAME   PASSWORD                                                        ENABLED
+---------- ------------------------------------------------------------ ----------
+kavana     $2a$10$UnZwy5.CUNh1x6hlVU/e1eHwEKSXp0hspQ0atZnrgJsRYRvArlWNO          1
+SAIF       $2a$10$W49iTNq82CLsHZIzV8NdW.HllX85yJv2znY6fiysrnLevwzVPDEFW          1
+ASWINI     $2a$10$z7xu.cTq09UWX2RLUTziWuU0bskprmz16dVZuDy6n2bPpKNuLMS4.          1
+
+
+package com.ofss;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+public class PasswordEncoderGenerator {
+
+  public static void main(String[] args) {
+
+	int i = 0;
+	
+		String password = "123";
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		String hashedPassword = passwordEncoder.encode(password);
+		System.out.println(hashedPassword+"!");
+  }
+}
+
+----------------------------------------------------------------------------
+
+WebMvcConfig.java:
+==================
+
+package com.ofss;
+/* replacing dispatcher-servlet.xml*/
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+
+@Configuration
+@EnableWebMvc
+@ComponentScan("com.ofss")
+public class WebMvcConfig {
+
+	@Bean
+	public InternalResourceViewResolver viewResolver() {
+		InternalResourceViewResolver vr = new InternalResourceViewResolver();
+
+		// set location of views.
+		vr.setPrefix("/WEB-INF/views/");
+
+		// set the extension of views.
+		vr.setSuffix(".jsp");
+
+		return vr;
+	}
+}
+
+
+MvcWebApplicationInitializer.java:
+===================================
+
+package com.ofss;  
+/* Replacing web.xml */  
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;  
+public class MvcWebApplicationInitializer extends  
+        AbstractAnnotationConfigDispatcherServletInitializer 
+        {  
+    @Override  
+    protected Class<?>[] getRootConfigClasses() {
+    	System.out.println("inside getRootConfigClasses");
+        return new Class[] { WebSecurityConfig.class, WebMvcConfig.class,AppConfig.class };  
+    }  
+    @Override  
+    protected Class<?>[] getServletConfigClasses() {  
+        System.out.println("Inside getServletConfigclasses method");  
+        return null;  
+    }  
+    @Override  
+    protected String[] getServletMappings() {
+    	System.out.println("inside getServletMappings method");
+    	return new String[] { "/" }; 
+    }  
+}  
+
+/src/db.properties
+==================
+
+oracle.driver=oracle.jdbc.driver.OracleDriver
+oracle.jdbcUrl=jdbc:oracle:thin:@localhost:1521:xe
+oracle.username=system
+oracle.password=Password123
+
+Program 13: Java Based custom form authentication and remember-me feature:
+==========================================================================
+/WEB-INF/views/login.jsp
+========================
+
+<h1> Login Page using Java Configuration</h1>
+<form action="/SpringSecurity2/login" method="post">
+	Enter username:<input type="text" name="username"><br>
+	Enter password:<input type="password" name="password"><br>
+	<input type="submit" value="Login"/>
+	<input type="checkbox" name="remember-me" /> Remember me  
+	<input type="hidden" name="${_csrf.parameterName}"
+		value="${_csrf.token}" />
+</form>
+
+
+HomeController.java (Just add the below method):
+================================================
+
+@RequestMapping(value="login", method=RequestMethod.GET)
+	public String loginMethod()
+	{
+		return "login";
+	}
+	
+WebSecurityConfig.java
+=======================
+
+package com.ofss;
+
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.*;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+//import org.springframework.security.config.annotation.authentication.builders.*;  
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;  
+import org.springframework.security.config.annotation.web.configuration.*;  
+import org.springframework.security.core.userdetails.User;  
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;  
+
+/** This configuration creates a Servlet Filter known as the springSecurityFilterChain. 
+ * It is responsible for protecting the application URLs, validating submit username and password, redirecting to the login form etc. 
+ * 
+ * @author admin
+ *
+ */
+@Configuration
+@EnableWebSecurity  
+@ComponentScan("com.ofss")  
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter  {  
+
+	@Autowired
+	  private DataSource dataSource;
+	
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http
+		.authorizeRequests()
+		.antMatchers("/private")
+		.hasRole("ADMIN")
+		.and()
+		.formLogin()
+		.loginPage("/login")
+		.and()
+		.rememberMe()
+		.rememberMeParameter("remember-me") // it is name of checkbox at login page  
+		.rememberMeCookieName("rememberme-cookie") // it is name of the cookie
+		.tokenValiditySeconds(10); // remember for number of seconds  
+		
+	}
+
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		System.out.println("Entering JDBC authentication");
+		auth.jdbcAuthentication().dataSource(dataSource)
+        .usersByUsernameQuery("select username, password, enabled"
+            + " from users where username=?")
+        .authoritiesByUsernameQuery("select username, role "
+            + "from user_roles where username=?")
+        .passwordEncoder(new BCryptPasswordEncoder());
+        
+        
+	}
+
+
+}  
+
+-----
+
+
+Program 14: Java Based Method Level Security: (authentication and authorization):
+====================================================================================
+
+HomeController.java:
+
+package com.ofss;  
+import java.security.Principal;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;  
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;  
+@Controller
+public class HomeController {
+
+	@RequestMapping(value="/",method=RequestMethod.GET)
+	public String index()
+	{
+		return "index";
+	}
+	
+	@RequestMapping(value="/user", method=RequestMethod.GET)    
+    public String user() {    
+       return "admin";  
+    }    
+	
+	@RequestMapping(value="/admin", method=RequestMethod.GET)    
+    public String admin() {    
+       return "admin";  
+    }    
+
+
+	@RequestMapping(value="/update", method=RequestMethod.GET)
+	@ResponseBody
+	@PreAuthorize("hasRole('ROLE_ADMIN')")  
+	public String update()
+	{
+		String msg="<h1>Record updated succesfully";
+		msg+="</h1><br><a href='http://localhost:8095/SpringSecurity2'>Home</a>";
+		return msg;
+	}
+}
+
+WebSecurityConfig.java:
+=======================
+package com.ofss;
+
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.*;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+//import org.springframework.security.config.annotation.authentication.builders.*;  
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;  
+import org.springframework.security.config.annotation.web.configuration.*;  
+import org.springframework.security.core.userdetails.User;  
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;  
+
+/** This configuration creates a Servlet Filter known as the springSecurityFilterChain. 
+ * It is responsible for protecting the application URLs, validating submit username and password, redirecting to the login form etc. 
+ * 
+ * @author admin
+ *
+ */
+@Configuration
+@EnableWebSecurity  
+@ComponentScan("com.ofss")
+@EnableGlobalMethodSecurity(prePostEnabled=true)  
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter  {  
+
+	@Autowired
+	  private DataSource dataSource;
+	
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http
+		.authorizeRequests()
+		.antMatchers("/index","/").permitAll()
+		.antMatchers("/admin","/user").authenticated()
+		.and()
+		.formLogin();
+	}
+
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		System.out.println("Entering JDBC authentication");
+		auth.jdbcAuthentication().dataSource(dataSource)
+        .usersByUsernameQuery("select username, password, enabled"
+            + " from users where username=?")
+        .authoritiesByUsernameQuery("select username, role "
+            + "from user_roles where username=?")
+        .passwordEncoder(new BCryptPasswordEncoder());
+        
+        
+	}
+
+
+}  
+
+index.jsp:
+==========
+<html>    
+<head>    
+<title>Home Page</title>    
+</head>    
+<body>    
+Welcome to Method Level Authentication! <br> <br>  
+Login as:   
+<a href="admin">Admin</a><br> 
+<a href="user">User</a>  
+</body>    
+</html>   
+
+admin.jsp:
+==========
+<html>    
+<head>    
+  
+<title>Home Page</title>    
+</head>    
+<body>
+<h1> Admin Page</h1>    
+<span style="color: green">Login Successful!</span>  
+<h1>Welcome ${username} </h1>
+<a href="update" style="text-decoration: none;">Update Record</a><br>  
+<a href='http://localhost:8095/SpringSecurity2'>Home</a>
+</body>    
+</html>   
+
+----
+REST API
+Program 15: Develop a REST API for building Customer profiles:
+=============================================================
+Project Name: SpringRest1
+
+Customer.java:
+==============
+package com.ofss;
+
+
+public class Customer{
+
+	private Long id;
+	private String firstName;
+	private String lastName;
+	private String email;to
+	pritottvate String mobile;
+
+	public Customer(long id, String firstName, String lastName, String email, String mobile) {
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.mobile = mobile;
+	}
+
+	public Customer() {
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getMobile() {
+		return mobile;
+	}
+
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+}
+CustomerDAO.java:
+=================
+package com.ofss;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
+
+@Component
+public class CustomerDAO {
+
+	// Dummy database. Initialize with some dummy values.
+	private static List<Customer> customers;
+	
+	{
+		customers = new ArrayList();
+		customers.add(new Customer(101, "Raj", "Bharti", "rbharthhi@gmail.com", "8739292912"));
+		customers.add(new Customer(201, "MS", "Dhoni", "msd@gmail.com", "3435452345"));
+		customers.add(new Customer(301, "Rohit", "Sharma", "rohit@gmail.com", "2987237874"));
+		customers.add(new Customer(401, "Guru", "Murthy", "guru.rama@gmail.com", "9731801675"));
+	}
+
+	/**
+	 * Returns list of customers from dummy database.
+	 * 
+	 * @return list of customers
+	 */
+	public List<Customer> list() {
+		return customers;
+	}
+
+	/**
+	 * Return customer object for given id from dummy database. If customer is
+	 * not found for id, returns null.
+	 * 
+	 * @param id
+	 *            customer id
+	 * @return customer object for given id
+	 */
+	public Customer get(Long id) {
+
+		for (Customer c : customers) {
+			if (c.getId().equals(id)) {
+				return c;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Create new customer in dummy database. Updates the id and insert new
+	 * customer in list.
+	 * 
+	 * @param customer
+	 *            Customer object
+	 * @return customer object with updated id
+	 */
+	public Customer create(Customer customer) {
+		if (customer.getId()==0)
+			customer.setId(System.currentTimeMillis());
+		else
+			customer.setId(customer.getId());
+		customers.add(customer);
+		return customer;
+	}
+
+	/**
+	 * Delete the customer object from dummy database. If customer not found for
+	 * given id, returns null.
+	 * 
+	 * @param id
+	 *            the customer id
+	 * @return id of deleted customer object
+	 */
+	public Long delete(Long id) {
+
+		for (Customer c : customers) {
+			if (c.getId().equals(id)) {
+				customers.remove(c);
+				return id;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Update the customer object for given id in dummy database. If customer
+	 * not exists, returns null
+	 * 
+	 * @param id
+	 * @param customer
+	 * @return customer object with id
+	 */
+	public Customer update(Long id, Customer customer) {
+
+		for (Customer c : customers) {
+			if (c.getId().equals(id)) {
+				customer.setId(c.getId());
+				customers.remove(c);
+				customers.add(customer);
+				return customer;
+			}
+		}
+
+		return null;
+	}
+	
+	public Customer patch(Long id, Customer customerInput) {
+
+		System.out.println("*** patch method called****");
+		for (Customer cExisting : customers) {
+			if (cExisting.getId().equals(id)) {
+				
+				if (customerInput.getFirstName()!=null&&!customerInput.getFirstName().equals(""))
+				{
+					cExisting.setFirstName(customerInput.getFirstName());
+				}
+				if (customerInput.getEmail()!=null && !customerInput.getEmail().equals(""))
+				{
+					cExisting.setEmail(customerInput.getEmail());
+				}
+
+				// replace with only required information
+				customers.set(customers.indexOf(cExisting), cExisting);
+				return cExisting;
+			}
+		}
+
+		return null;
+	}
+
+}
+
+CustomerRestController.java:
+============================
+Take jars from D:\SPRING-REST-LIB
+=================================
+
+package com.ofss;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+
+@RestController
+public class CustomerRestController {
+
+	
+	@Autowired
+	private CustomerDAO customerDAO;
+
+	
+	@GetMapping("/customers")
+	public List<Customer> getCustomers() {
+		System.out.println("**** RestController getCustomers() method");
+		return customerDAO.list();
+	}
+
+	@GetMapping("/customers/{id}")
+	public ResponseEntity getCustomer(@PathVariable("id") Long id) {
+
+		Customer customer = customerDAO.get(id);
+		if (customer == null) {
+			return new ResponseEntity("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
+		}
+
+		return new ResponseEntity(customer, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/customers")
+	public ResponseEntity createCustomer(@RequestBody Customer customer) {
+
+		customerDAO.create(customer);
+
+		return new ResponseEntity(customer, HttpStatus.OK);
+	}
+
+	@DeleteMapping("/customers/{id}")
+	public ResponseEntity deleteCustomer(@PathVariable Long id) {
+
+		if (null == customerDAO.delete(id)) {
+			return new ResponseEntity("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
+		}
+
+		return new ResponseEntity(id, HttpStatus.OK);
+
+	}
+
+	@PutMapping("/customers/{id}")
+	public ResponseEntity updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
+
+		customer = customerDAO.update(id, customer);
+
+		if (null == customer) {
+			return new ResponseEntity("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
+		}
+
+		return new ResponseEntity(customer, HttpStatus.OK);
+	}
+
+	
+	@PatchMapping("/customers/{id}")
+	public ResponseEntity patchCustomer(@PathVariable Long id, @RequestBody Customer customer) {
+
+		customer = customerDAO.patch(id, customer);
+
+		if (null == customer) {
+			return new ResponseEntity("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
+		}
+
+		return new ResponseEntity(customer, HttpStatus.OK);
+	}
+
+}
+
+
+FrontControllerConfig.java:
+===========================
+package com.ofss;
+/* Replacing web.xml */
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+
+public class FrontControllerConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
+
+	@Override
+	protected Class<?>[] getRootConfigClasses() {
+
+		return new Class[] { WebMvcConfig.class };
+	}
+
+	@Override
+	protected Class<?>[] getServletConfigClasses() {
+
+		return null;
+	}
+
+	@Override
+	protected String[] getServletMappings() {
+		return new String[] { "/" };
+	}
+}
+WebMvcConfig.java:
+==================
+package com.ofss;
+/* replacing dispatcher-servlet.xml*/
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+
+@Configuration
+@EnableWebMvc
+@ComponentScan("com.ofss")
+public class WebMvcConfig {
+
+	@Bean
+	public InternalResourceViewResolver viewResolver() {
+		InternalResourceViewResolver vr = new InternalResourceViewResolver();
+
+		// set location of views.
+		vr.setPrefix("/WEB-INF/views/");
+
+		// set the extension of views.
+		vr.setSuffix(".jsp");
+
+		return vr;
+	}
+}
+
+Program 16: Develop a REST API for building Customer profiles 
+=============================================================
+(Returning resources in XML and JSON - content negotiation)
+
+Just change the following method in CustomerRestController class:
+
+import org.springframework.http.MediaType;
+
+
+
+	@GetMapping(value="/customers",produces= {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+	public List<Customer> getCustomers() {
+		System.out.println("**** RestController @GetMapping method");
+		return customerDAO.list();
+	}
+
+	
+In postman, you need to add request header as:
+
+Accept: application/xml to get XML format
+Accept: application/json to get JSON format
+
+Program 17: REST API from DATABASE TABLE:
+=========================================
+
+Create customer1 table as follows:
+
+SQL> desc customer1;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ FIRSTNAME                                          VARCHAR2(10)
+ LASTNAME                                           VARCHAR2(10)
+ MOBILE                                             NUMBER(10)
+ EMAIL                                              VARCHAR2(10)
+ ID                                                 NUMBER(10)
+
+ 
+ CustomerDAO.java:
+ =================
+ 
+ package com.ofss;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
+
+
+@Component
+public class CustomerDAO {
+
+	public CustomerDAO() {
+		if (dataSource==null)
+			dataSource=new BasicDataSource();
+		dataSource.setDriverClassName("oracle.jdbc.driver.OracleDriver");
+		dataSource.setUrl("jdbc:oracle:thin:@localhost:1521:xe");
+		dataSource.setUsername("system");
+		dataSource.setPassword("Password123");
+
+
+		if (template==null)
+		{
+			template=new JdbcTemplate();
+			template.setDataSource(dataSource);
+		}
+	}
+
+	private static List<Customer> customers;
+
+
+	BasicDataSource dataSource;
+
+
+	JdbcTemplate template;
+
+	public JdbcTemplate getTemplate() {
+		return template;
+	}
+
+	public void setTemplate(JdbcTemplate template) {
+		this.template = template;
+	}
+
+
+	/**
+	 * Returns list of customers from the table customer1
+	 * 
+	 * @return list of customers
+	 */
+	public List<Customer> list() {
+		System.out.println("***DAO list method ");
+		String sql="select * from customer1";
+		customers=template.query(sql, new RowMapper() {
+
+			@Override
+			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Customer cust=new Customer(rs.getLong(5),rs.getString(1),rs.getString(2),rs.getString(4),rs.getString(3));
+				return cust;
+			}
+
+
+		});
+		return customers;
+
+	}
+
+	/**
+	 * Return customer object for given id from dummy database. If customer is
+	 * not found for id, returns null.
+	 * 
+	 * @param id
+	 *            customer id
+	 * @return customer object for given id
+	 */
+	public Customer get(Long id) {
+
+		for (Customer c : customers) {
+			if (c.getId().equals(id)) {
+				return c;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Create new customer in dummy database. Updates the id and insert new
+	 * customer in list.
+	 * 
+	 * @param customer
+	 *            Customer object
+	 * @return customer object with updated id
+	 * @throws SQLException 
+	 */
+	public Customer create(Customer customer) throws SQLException {
+		if (customer.getId()==0)
+			customer.setId(System.currentTimeMillis());
+		else
+			customer.setId(customer.getId());
+
+
+		String sql="insert into customer1 values(?,?,?,?,?)";
+
+		int res=template.update(sql, customer.getFirstName(),customer.getLastName(),customer.getMobile(),customer.getEmail(),customer.getId());
+		if (res>0)
+		{
+			System.out.println("successfully added");
+		}
+		return customer;
+	}
+
+	/**
+	 * Delete the customer object from dummy database. If customer not found for
+	 * given id, returns null.
+	 * 
+	 * @param id
+	 *            the customer id
+	 * @return id of deleted customer object
+	 */
+	public Long delete(Long id) {
+
+		for (Customer c : customers) {
+			if (c.getId().equals(id)) {
+				customers.remove(c);
+				return id;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Update the customer object for given id in dummy database. If customer
+	 * not exists, returns null
+	 * 
+	 * @param id
+	 * @param customer
+	 * @return customer object with id
+	 */
+	public Customer update(Long id, Customer customer) {
+
+		for (Customer c : customers) {
+			if (c.getId().equals(id)) {
+				customer.setId(c.getId());
+				customers.remove(c);
+				customers.add(customer);
+				return customer;
+			}
+		}
+
+		return null;
+	}
+
+	public Customer patch(Long id, Customer customerInput) {
+
+		System.out.println("*** patch method called****");
+		for (Customer cExisting : customers) {
+			if (cExisting.getId().equals(id)) {
+
+				if (customerInput.getFirstName()!=null&&!customerInput.getFirstName().equals(""))
+				{
+					cExisting.setFirstName(customerInput.getFirstName());
+				}
+				if (customerInput.getEmail()!=null && !customerInput.getEmail().equals(""))
+				{
+					cExisting.setEmail(customerInput.getEmail());
+				}
+
+				// replace with only required information
+				customers.set(customers.indexOf(cExisting), cExisting);
+				return cExisting;
+			}
+		}
+
+		return null;
+	}
+
+}
+
+Customer.java:
+=============
+
+package com.ofss;
+
+
+public class Customer{
+
+	private Long id;
+	private String firstName;
+	private String lastName;
+	private String email;
+	private String mobile;
+
+	public Customer(long id, String firstName, String lastName, String email, String mobile) {
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.mobile = mobile;
+	}
+
+	public Customer() {
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getMobile() {
+		return mobile;
+	}
+
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+}
+
+CustomerRestController.java:
+============================
+
+package com.ofss;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+
+@RestController
+public class CustomerRestController {
+
+	
+
+	private CustomerDAO customerDAO;
+
+	public CustomerRestController() {
+		if (customerDAO==null)
+			customerDAO=new CustomerDAO();
+	}
+	
+
+	@GetMapping(value="/customers",produces= {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+	public List<Customer> getCustomers() {
+		return customerDAO.list();
+	}
+
+	@GetMapping(value="/customers/{id}",produces= {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity getCustomer(@PathVariable("id") Long id) {
+
+		Customer customer = customerDAO.get(id);
+		if (customer == null) {
+			return new ResponseEntity("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
+		}
+
+		return new ResponseEntity(customer, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/customers")
+	public ResponseEntity createCustomer(@RequestBody Customer customer) {
+
+		try {
+			customerDAO.create(customer);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return new ResponseEntity(customer, HttpStatus.OK);
+	}
+
+	@DeleteMapping("/customers/{id}")
+	public ResponseEntity deleteCustomer(@PathVariable Long id) {
+
+		if (null == customerDAO.delete(id)) {
+			return new ResponseEntity("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
+		}
+
+		return new ResponseEntity(id, HttpStatus.OK);
+
+	}
+
+	@PutMapping("/customers/{id}")
+	public ResponseEntity updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
+
+		customer = customerDAO.update(id, customer);
+
+		if (null == customer) {
+			return new ResponseEntity("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
+		}
+
+		return new ResponseEntity(customer, HttpStatus.OK);
+	}
+
+	
+	@PatchMapping("/customers/{id}")
+	public ResponseEntity patchCustomer(@PathVariable Long id, @RequestBody Customer customer) {
+
+		customer = customerDAO.patch(id, customer);
+
+		if (null == customer) {
+			return new ResponseEntity("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
+		}
+
+		return new ResponseEntity(customer, HttpStatus.OK);
+	}
+
+}
+
+
+
+FrontControllerConfig.java:
+===========================
+package com.ofss;
+/* Replacing web.xml */
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+
+public class FrontControllerConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
+
+	@Override
+	protected Class<?>[] getRootConfigClasses() {
+
+		return new Class[] { WebMvcConfig.class };
+	}
+
+	@Override
+	protected Class<?>[] getServletConfigClasses() {
+
+		return null;
+	}
+
+	@Override
+	protected String[] getServletMappings() {
+		return new String[] { "/" };
+	}
+}
+
+WebMvcConfig.java:
+==================
+
+package com.ofss;
+/* replacing dispatcher-servlet.xml*/
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+
+@Configuration
+@EnableWebMvc
+@ComponentScan("com.ofss")
+public class WebMvcConfig {
+
+	@Bean
+	public InternalResourceViewResolver viewResolver() {
+		InternalResourceViewResolver vr = new InternalResourceViewResolver();
+
+		// set location of views.
+		vr.setPrefix("/WEB-INF/views/");
+
+		// set the extension of views.
+		vr.setSuffix(".jsp");
+
+		return vr;
+	}
+}
+
+
