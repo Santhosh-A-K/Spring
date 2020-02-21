@@ -1,0 +1,443 @@
+Class notes on 21-Feb-2020
+==========================
+
+Day 3: 
+======
+
+1. Session Tracking in Spring MVC
+
+
+<form action="createSession">
+	Enter name: <input type="text" name="employeeName"><br>
+	Enter city: <input type="text" name="employeeCity"><br>
+	<input type="submit" value="Login"/>
+</form>
+
+In Spring MVC, every action performed by the user such as click, the control will go to DispatcherServlet and it will decide which control method to call
+
+It will invoke the corresponding controller method
+The controller method will be executed and it returns the view name
+The specific view will be displayed
+
+---
+
+http://localhost:8087/SpringSessionTrackingGuru/
+
+Thumb rule:
+
+1. At any time, you want to show HTML page, don't involve Dispatcher Servlet.
+	technique:
+		use the url pattern properly
+		<url-pattern>ibm/* </pattern>
+
+2. At any time, you want to return a view (jsp), that contains some coding (dynamic page), route it through the DispatcherServlet
+
+	This goes to controller method
+	Executes the logic over there
+	Returns a view name (.jsp)
+
+2. Java Based Configuration (no xml needed)
+===========================================
+
+There are no xml files.
+We need to define 2 java classes now
+
+One java class for replacing web.xml
+Another java class for replacing <servlet-name>-servlet.xml 
+
+Q:
+without .xml, how it is identifying?
+
+A:
+
+1. You have selected dynamic web project version 3.1 
+	This will automatically disable all .xml
+
+2. In your class, you have extended from
+	AbstractAnnotationConfigDispatcherServletInitializer
+	This class has methods to initialize the DispatcherServlet
+
+----
+
+Normal employee:
+
+	/company/general_details (public access)
+
+	/company/financial_matters (private access)
+		Only the permitted users can access them
+	(This URL needs to be secured)
+
+
+---
+How to do form based authentication?
+
+3 types of authentication:
+
+	1. basic authentication
+		window popup shows
+
+
+	2. form authentication
+		Spring will provide you a login form
+		<login-form/>
+
+	3. custom form authentication
+		user can provide a login form
+
+for form authentication and logout, we did not write any single line of code.  the following will take care:
+
+	<form-login>
+	<logout logout-success-url="/logout"/>
+
+	j_spring_security_logout
+	j_username
+	j_password
+
+Hands-on:
+	1. Use form authentication
+
+	2. In private page, put a link for "logout"
+		Logout.jsp should be displayed
+
+Password in plain text: guru123
+Hashed password: &&*kmxmxmxz**K,c,
+	We have several algorithms
+
+-----------
+SPRING BOOT
+Using Spring Boot, we are going to develop RESTful WEBSERVICES.
+
+In REST, everything is considered as RESOURCES
+What one can do with resources?
+
+1. Create a new resource
+2. Read all the resrouces
+3. Modify or Update the resources
+4. Deleting the resources
+
+These operations are known as CRUD
+
+If your project manages the RESOURCES, you can go for RESTful web services.
+
+RESTful web services *** IS NOT NEW *****
+It is based on OLD METHODS
+
+HTTP methods:
+	GET
+	POST
+	PUT
+	DELETE
+	HEAD
+	PATCH
+
+URI:
+	/customers
+
+	/products
+
+	/employees
+
+1. 
+
+/employees and GET method
+
+I should return a list of employees
+
+2.
+
+/employee/1 and GET method
+
+I should return employee detail about employee with id '1'
+
+3.
+
+/employees/chennai and GET method
+
+List out all Chennai based employees
+
+4.
+
+/employees and DELETE
+
+Delete all employes
+
+5. 
+
+/employees/5 and DELETE
+
+Deleting employee with id "5"
+
+6.
+
+/employee and POST
+
+I want to create a new employee resource
+{
+
+	"empId": "1",
+	"empname": " Guru",
+	"EmpLoc": "Bangalore"
+
+}
+
+7.
+
+/employee/Guru and PUT
+
+I want to update the employee "Guru" with some information
+PUT method will be used for complete replacement of the resource
+
+There is 5th method also available, "PATCH"
+Used to update only certain details (emailId, location, mobileNumber)
+
+REST stands for:
+
+	REpresentational State Transfer
+
+State refers to DATA
+
+JSON:
+	{
+		"empName": "Guru",
+		"empLoc": "Bangalore"
+
+	}
+
+XML:
+
+	<employee>
+
+		<name> Guru </name>
+		<location> Bangalore </location>
+	</employee>
+
+txt:
+
+	Guru, Bangalore
+
+
+----
+
+
+Why to use @RestController instead of @Controller?
+
+If you use @controller, you will be returning (Model and View)
+
+If you use @RestController, you will be retruning (Response)
+
+I have completed developing the first REST API
+
+http://localhost:1234/hello
+
+/hello - REST END POINT
+
+http://localhost:1234/welcome
+
+/welcome
+I have completed developing the second REST API
+
+http://localhost:1234/welcome and POST method,
+I want to display something else
+
+---
+
+Spring Boot gives you various starter templates that you can readily use
+
+spring-boot-starter-web => use this for web app development
+
+spring-boot-starter-data-jdbc => use this for JDBC programming
+
+spring-boot-starter-data-jpa ==> use this for JPA programming
+
+You want to download mongodb
+
+--
+
+Case study:
+
+1. REST END POINT:
+
+Listing out the customer details that CA maintains
+
+REST END POINT: /customers
+HTTP method type: GET
+
+Problem:
+
+If you are behind the corporate's proxy server, maven CAN'T download
+jar files from central repository
+
+
+Solution:
+
+Create settings.xml file in .m2 folder
+
+2. Use Case:
+
+/customer/7 -- URI or REST end point
+method: GET
+
+
+List out only one customer based on cust id
+
+
+Use Case:
+
+Deleting a customer object from the List for a given customer id
+
+my email id:
+
+	gurumurthy.ramamurthy@gmail.com
+	or
+	java.guru@yahoo.com
+
+Mobile: +91-9731801675
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Program 1: 
+Printing "Hello World" in the browser using Spring Boot
+
+
+
+
+
+
+
+
+
+	
+
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3. Spring Security
+4. Spring Boot (Creating RESTful webservices) 
+	We will be using STS tool (very similar to eclipse)
+5. Testing Spring App with postman tool
+
+-----
+
